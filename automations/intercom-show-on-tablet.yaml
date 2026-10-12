@@ -1,0 +1,56 @@
+# When the intercom rings: wake the wall tablet and open the Intercom view.
+# After 2 minutes, go back to the home view if nobody picked up.
+#
+# Author's tablet: Echo Show 8 running Kiosk Satellite (ESPHome entities).
+# If you use a different tablet/kiosk app, replace the three "tablet" actions
+# (light / switch / select) with the equivalent for your setup, e.g. a
+# "navigate" action. PRs with other kiosk apps are very welcome.
+#
+# Replace the entity ids marked  # <-- CHANGE
+
+alias: Front entrance - show Intercom on tablet
+description: Wake the tablet and open the Intercom view when the intercom rings
+mode: restart
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.front_entrance_ding          # <-- CHANGE (ring-mqtt ding sensor)
+    to: "on"
+  # Optional second trigger: the official Ring integration's ding event.
+  # Add it if your ding sensor sometimes misses rings.
+  # - trigger: state
+  #   entity_id: event.front_entrance_ding                # <-- CHANGE
+actions:
+  # Wake the screen (these two may not exist on your tablet; they don't block the rest)
+  - action: light.turn_on
+    target:
+      entity_id: light.echo_show_screen                   # <-- CHANGE
+    data:
+      brightness_pct: 65
+    continue_on_error: true
+  - action: switch.turn_on
+    target:
+      entity_id: switch.echo_show_hold_mode               # <-- CHANGE
+    continue_on_error: true
+  # Open the Intercom view. The option text must match your dashboard path, e.g.
+  # "<dashboard-url-path>/intercom". Check the entity's `options` attribute.
+  - action: select.select_option
+    target:
+      entity_id: select.echo_show_dashboard_view          # <-- CHANGE
+    data:
+      option: echo-home/intercom                          # <-- CHANGE
+  - delay: "00:02:00"
+  # Nobody answered -> go back to the home view
+  - if:
+      - condition: state
+        entity_id: input_boolean.intercom_answered
+        state: "off"
+    then:
+      - action: select.select_option
+        target:
+          entity_id: select.echo_show_dashboard_view      # <-- CHANGE
+        data:
+          option: echo-home/home                          # <-- CHANGE
+      - action: switch.turn_off
+        target:
+          entity_id: switch.echo_show_hold_mode           # <-- CHANGE
+        continue_on_error: true

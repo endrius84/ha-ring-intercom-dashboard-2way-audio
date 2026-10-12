@@ -1,0 +1,27 @@
+# go2rtc configuration (Home Assistant go2rtc add-on -> Configuration, or go2rtc.yaml)
+#
+# Replace the three <PLACEHOLDERS>. NEVER commit the real values.
+#
+#   <CAMERA_ID>      the Ring id of your Intercom (shown in go2rtc's
+#                    Add -> Ring page after you log in with a refresh token)
+#   <DEVICE_ID>      the Ring "device_id" from the same page
+#   <REFRESH_TOKEN>  Ring has no API key. Create a refresh token on any computer with
+#                    Node.js:  npx -y -p ring-client-api@latest ring-auth-cli
+#                    (enter Ring e-mail, password and the 2FA code). Create a FRESH
+#                    one for this file - the one you pasted into go2rtc's web page is used up.
+#                    See the README, steps 1-3.
+#
+# Format rules that cost the author hours:
+#   * ALL THREE of camera_id, device_id and refresh_token are required.
+#     With only two you get "ring: wrong query".
+#   * Do NOT wrap the URL or the token in quotes (that produces a YAML error).
+#   * A trailing "==" in the token must be written as "%3D%3D".
+#   * A refresh token is effectively single use. If you paste it into go2rtc's
+#     web "Add -> Ring" page first, it is consumed and the config then fails
+#     with 401 invalid_grant. Generate a fresh token and put it straight
+#     into this file instead.
+#   * Do NOT add this stream to a `preload:` section - it would keep the
+#     intercom's live session (and LED) on permanently and drain the battery.
+
+streams:
+  ring-intercom: ring:?camera_id=<CAMERA_ID>&device_id=<DEVICE_ID>&refresh_token=<REFRESH_TOKEN>

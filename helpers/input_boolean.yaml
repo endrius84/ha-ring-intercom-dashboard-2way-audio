@@ -1,0 +1,12 @@
+# One helper is needed: a toggle that means "the call is answered".
+#
+# Option A (UI):   Settings -> Devices & services -> Helpers -> Create helper
+#                  -> Toggle -> name it "Intercom answered"
+#                  The entity id MUST be: input_boolean.intercom_answered
+#
+# Option B (YAML): add this to configuration.yaml and restart Home Assistant.
+
+input_boolean:
+  intercom_answered:
+    name: Intercom answered
+    icon: mdi:phone-in-talk

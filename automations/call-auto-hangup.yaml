@@ -1,0 +1,16 @@
+# Safety net: if a call is left "answered" for 2 minutes, hang up automatically.
+# This closes the audio stream and lets the Ring Intercom go back to sleep,
+# which matters because an open live session drains the intercom's battery.
+
+alias: Intercom - auto hang up after 2 minutes
+description: Turn the answered toggle off if a call is left open
+mode: single
+triggers:
+  - trigger: state
+    entity_id: input_boolean.intercom_answered
+    to: "on"
+    for: "00:02:00"
+actions:
+  - action: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.intercom_answered

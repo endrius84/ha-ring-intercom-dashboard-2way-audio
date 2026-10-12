@@ -1,0 +1,381 @@
+# Complete dashboard for the Ring Intercom 2-way audio screen.
+# Paste into: Dashboard -> three dots -> Raw configuration editor
+# (use a NEW dashboard, or merge `button_card_templates` and the view into your own).
+# Required HACS frontend cards: button-card, layout-card, WebRTC Camera.
+
+button_card_templates:
+  ring_tile:
+    layout: icon_name_state2nd
+    show_state: true
+    show_name: true
+    tap_action:
+      action: more-info
+    hold_action:
+      action: more-info
+    icon_tap_action:
+      action: more-info
+    variables:
+      accent: '#ffb300'
+    styles:
+      card:
+        - height: 60px
+        - padding: 0 10px
+        - border-radius: 16px
+        - background: rgba(58,58,60,0.55)
+        - border: none
+        - box-shadow: none
+      grid:
+        - grid-template-columns: 40px 1fr
+        - grid-template-rows: 1fr 1fr
+      img_cell:
+        - width: 32px
+        - height: 32px
+        - border-radius: 50%
+        - background: rgba(255,255,255,0.10)
+        - justify-self: start
+        - cursor: pointer
+      icon:
+        - width: 19px
+        - color: rgba(255,255,255,0.7)
+      name:
+        - justify-self: start
+        - align-self: end
+        - font-size: 13px
+        - font-weight: '600'
+        - color: '#ffffff'
+        - overflow: hidden
+        - text-overflow: ellipsis
+        - white-space: nowrap
+        - max-width: 100%
+        - padding-bottom: 1px
+      state:
+        - justify-self: start
+        - align-self: start
+        - font-size: 12px
+        - color: rgba(255,255,255,0.55)
+    state:
+      - id: active
+        operator: template
+        value: >-
+          [[[ return !!entity &&
+          ['on','open','opening','unlocked','detected'].includes(entity.state)
+          ]]]
+        styles:
+          card:
+            - background: rgba(255,255,255,0.94)
+          name:
+            - color: '#1c1c1e'
+          state:
+            - color: rgba(60,60,67,0.6)
+          img_cell:
+            - background: rgba(0,0,0,0.05)
+          icon:
+            - color: '[[[ return variables.accent ]]]'
+  ring_info:
+    template: ring_tile
+
+views:
+  - title: Intercom
+    path: intercom
+    icon: mdi:phone
+    type: sidebar
+    # theme: Apple Home   # optional - the tiles below are self-contained and do not need a theme
+    cards:
+      - type: custom:layout-card
+        layout_type: custom:grid-layout
+        layout:
+          grid-template-columns: 504px 240px
+          justify-content: start
+          grid-gap: 12px
+          align-items: start
+          margin: '0'
+          padding: 8px 12px 8px 16px
+          mediaquery:
+            '(max-width: 600px)':
+              grid-template-columns: 1fr
+        cards:
+          # ---------------- LEFT: animated phone + stream strip ----------------
+          - type: vertical-stack
+            cards:
+              - type: custom:button-card
+                entity: binary_sensor.front_entrance_ding
+                triggers_update:
+                  - input_boolean.intercom_answered
+                show_name: false
+                show_icon: false
+                show_state: false
+                tap_action:
+                  action: none
+                styles:
+                  card:
+                    - background: '#000'
+                    - border-radius: 28px
+                    - border: 1px solid rgba(255,255,255,0.12)
+                    - box-shadow: none
+                    - padding: 0
+                    - width: 504px
+                    - height: 378px
+                    - max-width: 100%
+                    - flex-shrink: 0
+                    - box-sizing: border-box
+                  grid:
+                    - grid-template-areas: '"phone"'
+                    - grid-template-columns: 100%
+                    - align-items: center
+                    - height: 100%
+                extra_styles: >
+                  .ph { display:flex; flex-direction:column; align-items:center;
+                  justify-content:center; width:100%; }
+
+                  .ph.idle     { --c: #ffffff; }
+
+                  .ph.ringing  { --c: #ff9f0a; }
+
+                  .ph.answered { --c: #30d158; }
+
+                  .ph svg { width: 58%; max-width: 300px; height: auto; overflow:
+                  visible; }
+
+                  .ph .hs   { transform-origin: 100px 100px; transition: transform
+                  .5s ease; }
+
+                  .ph .arc  { opacity: 0; stroke: var(--c); }
+
+                  .ph .halo { opacity: 0; transform-origin: 100px 100px; }
+
+                  .ph .ring { stroke: var(--c); transition: stroke .4s; }
+
+                  .ph .outer{ stroke: var(--c); opacity: .22; transition: stroke
+                  .4s; }
+
+                  .ph.ringing .hs   { animation: ph-shake 1.4s ease-in-out infinite;
+                  }
+
+                  .ph.ringing .arc  { animation: ph-arc 1.4s ease-in-out infinite; }
+
+                  .ph.ringing .a2   { animation-delay: .15s; }
+
+                  .ph.ringing .a3   { animation-delay: .30s; }
+
+                  .ph.ringing .halo { animation: ph-halo 1.4s ease-out infinite; }
+
+                  .ph.answered .hs  { transform: translate(-7px,-9px)
+                  rotate(-24deg); }
+
+                  .ph.answered .arc { animation: ph-breathe 2.4s ease-in-out
+                  infinite; }
+
+                  .ph.answered .a2  { animation-delay: .3s; }
+
+                  .ph.answered .a3  { animation-delay: .6s; }
+
+                  .ph .lbl { color:#fff; font-size:22px; font-weight:600;
+                  margin-top:2px; }
+
+                  .ph .sub { font-size:15px; margin-top:2px; color: var(--c); }
+
+                  .ph.idle .sub { color: rgba(235,235,245,.6); }
+
+                  @keyframes ph-shake {
+                    0%,40%,100% { transform: rotate(0deg); }
+                    4%  { transform: rotate(-14deg); }
+                    9%  { transform: rotate(12deg); }
+                    14% { transform: rotate(-12deg); }
+                    19% { transform: rotate(10deg); }
+                    24% { transform: rotate(-8deg); }
+                    29% { transform: rotate(6deg); }
+                    34% { transform: rotate(-3deg); }
+                  }
+
+                  @keyframes ph-arc {
+                    0%   { opacity: 0; }
+                    30%  { opacity: 1; }
+                    70%  { opacity: 1; }
+                    100% { opacity: 0; }
+                  }
+
+                  @keyframes ph-halo {
+                    0%   { transform: scale(.95); opacity: .55; }
+                    100% { transform: scale(1.22); opacity: 0; }
+                  }
+
+                  @keyframes ph-breathe {
+                    0%,100% { opacity: .25; }
+                    50%     { opacity: 1; }
+                  }
+                custom_fields:
+                  phone: >-
+                    [[[ const a = states["input_boolean.intercom_answered"]; const
+                    answered = !!a && a.state === "on"; const ringing = !!entity &&
+                    entity.state === "on"; const st = answered ? "answered" :
+                    (ringing ? "ringing" : "idle"); const sub = answered ? "On call"
+                    : (ringing ? "Ringing…" : "Standby"); return `<div class="ph
+                    ${st}"><svg viewBox="0 0 200 200"><circle class="outer" cx="100"
+                    cy="100" r="92" fill="none" stroke-width="1.5"/><circle
+                    class="halo" cx="100" cy="100" r="72" fill="none"
+                    stroke-width="2" style="stroke:var(--c)"/><circle class="ring"
+                    cx="100" cy="100" r="72" fill="none" stroke-width="3"/><g
+                    class="hs"><g transform="translate(100 100) scale(3.3)
+                    translate(-12 -12)"><path fill="#fff" d="M6.62,10.79C8.06,13.62
+                    10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82
+                    16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1
+                    21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1
+                    0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31
+                    8.82,8.59L6.62,10.79Z"/></g></g><path class="arc a1" d="M 112 70
+                    A 18 18 0 0 1 130 88" fill="none" stroke-width="4"
+                    stroke-linecap="round"/><path class="arc a2" d="M 112 56 A 32 32
+                    0 0 1 144 88" fill="none" stroke-width="4"
+                    stroke-linecap="round"/><path class="arc a3" d="M 112 42 A 46 46
+                    0 0 1 158 88" fill="none" stroke-width="4"
+                    stroke-linecap="round"/></svg><div class="lbl">Front
+                    Entrance</div><div class="sub">${sub}</div></div>`; ]]]
+              # Ring Intercom stream: this card only exists while a call is answered.
+              # Do NOT add `background: true` here - it keeps the stream (and the
+              # intercom's live session) running after you hang up.
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: input_boolean.intercom_answered
+                    state: 'on'
+                card:
+                  type: custom:webrtc-camera
+                  url: ring-intercom
+                  name: Intercom
+                  mode: webrtc
+                  media: audio,microphone
+                  ui: false
+                  muted: false
+                  style: >
+                    video { display:block; width:100%; height:126px;
+                    background:#000; border-radius:20px; }
+
+                    .mode { display:none }
+          # ---------------- RIGHT: call buttons + tiles ----------------
+          - type: vertical-stack
+            cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    entity: input_boolean.intercom_answered
+                    name: '[[[ return entity.state === "on" ? "On call" : "Pick up"; ]]]'
+                    icon: mdi:phone
+                    tap_action:
+                      action: call-service
+                      service: input_boolean.turn_on
+                      service_data:
+                        entity_id: input_boolean.intercom_answered
+                    styles:
+                      card:
+                        - background: none
+                        - border: none
+                        - box-shadow: none
+                        - padding: 4px 0
+                        - justify-items: center
+                      img_cell:
+                        - width: 64px
+                        - height: 64px
+                        - border-radius: 50%
+                        - margin: 0 auto
+                        - display: flex
+                        - align-items: center
+                        - justify-content: center
+                        - background: >-
+                            [[[ return entity.state === "on" ?
+                            "rgba(255,255,255,0.9)" : "#30d158"; ]]]
+                      icon:
+                        - width: 30px
+                        - color: >-
+                            [[[ return entity.state === "on" ? "#30d158" : "#fff";
+                            ]]]
+                      name:
+                        - font-size: 12px
+                        - font-weight: 500
+                        - margin-top: 8px
+                        - color: rgba(235,235,245,.85)
+                  - type: custom:button-card
+                    entity: input_boolean.intercom_answered
+                    name: Hang up
+                    icon: mdi:phone-hangup
+                    tap_action:
+                      action: call-service
+                      service: input_boolean.turn_off
+                      service_data:
+                        entity_id: input_boolean.intercom_answered
+                    styles:
+                      card:
+                        - background: none
+                        - border: none
+                        - box-shadow: none
+                        - padding: 4px 0
+                        - justify-items: center
+                      img_cell:
+                        - width: 64px
+                        - height: 64px
+                        - border-radius: 50%
+                        - margin: 0 auto
+                        - display: flex
+                        - align-items: center
+                        - justify-content: center
+                        - background: '#ff453a'
+                      icon:
+                        - width: 30px
+                        - color: '#fff'
+                      name:
+                        - font-size: 12px
+                        - font-weight: 500
+                        - margin-top: 8px
+                        - color: rgba(235,235,245,.85)
+              - type: custom:button-card
+                template: ring_info
+                entity: binary_sensor.front_entrance_ding
+                name: Doorbell
+                variables:
+                  accent: '#ff9f0a'
+              - type: custom:button-card
+                template: ring_info
+                entity: lock.front_entrance_lock
+                name: Door Unlock
+                icon: mdi:lock
+                state_display: '[[[ return entity ? entity.state : "n/a"; ]]]'
+                tap_action:
+                  action: more-info
+                icon_tap_action:
+                  action: call-service
+                  service: lock.unlock
+                  service_data:
+                    entity_id: lock.front_entrance_lock
+                hold_action:
+                  action: more-info
+              - type: custom:button-card
+                template: ring_info
+                entity: number.front_entrance_doorbell_volume
+                name: Doorbell volume
+                icon: mdi:bell-ring-outline
+                state_display: >-
+                  [[[ return entity && !isNaN(Number(entity.state)) ?
+                  Math.round(entity.state) : (entity ? entity.state : "n/a"); ]]]
+              - type: custom:button-card
+                template: ring_info
+                entity: number.front_entrance_mic_volume
+                name: Mic volume
+                icon: mdi:microphone
+                state_display: >-
+                  [[[ return entity && !isNaN(Number(entity.state)) ?
+                  Math.round(entity.state) : (entity ? entity.state : "n/a"); ]]]
+              - type: custom:button-card
+                template: ring_info
+                entity: number.front_entrance_voice_volume
+                name: Voice volume
+                icon: mdi:volume-high
+                state_display: >-
+                  [[[ return entity && !isNaN(Number(entity.state)) ?
+                  Math.round(entity.state) : (entity ? entity.state : "n/a"); ]]]
+              - type: custom:button-card
+                template: ring_info
+                entity: sensor.front_entrance_battery
+                name: Battery
+                icon: mdi:battery-70
+                state_display: >-
+                  [[[ return entity && !isNaN(Number(entity.state)) ?
+                  Math.round(entity.state) + "%" : (entity ? entity.state : "n/a");
+                  ]]]
