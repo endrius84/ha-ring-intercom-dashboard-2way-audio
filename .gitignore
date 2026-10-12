@@ -1,0 +1,18 @@
+# Never commit real configs or secrets
+go2rtc.yaml
+*.secret
+secrets.yaml
+.env
+*.pem
+*.key
+
+# Raw exports / dumps (they contain tokens)
+streams*.json
+api-streams*.json
+*.har
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
