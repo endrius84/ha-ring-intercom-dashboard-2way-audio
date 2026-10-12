@@ -23,7 +23,7 @@ The audio stream card only exists while a helper toggle (`input_boolean.intercom
 so no call = no stream = the intercom stays asleep.
 
 **Repo (config, dashboard YAML, automations, troubleshooting):**
-https://github.com/YOUR_GITHUB_USERNAME/ha-ring-intercom-dashboard
+https://github.com/endrius84/ha-ring-intercom-dashboard-2way-audio
 
 **Status: beta.** It works on my setup (audio-only battery Ring Intercom, go2rtc add-on 1.9.14,
 ring-mqtt for ring events, Echo Show 8 with Kiosk Satellite as the wall tablet), but that's the only
